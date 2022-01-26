@@ -6,18 +6,17 @@
 import { FontAwesome } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { ColorSchemeName, Pressable } from 'react-native';
+import {ColorSchemeName, Platform, Pressable} from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
-import ModalScreen from '../screens/ModalScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import TabOneScreen from '../screens/TabOneScreen';
 import TabTwoScreen from '../screens/TabTwoScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
+import {createDrawerNavigator} from '@react-navigation/drawer';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -33,19 +32,40 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
  * A root stack navigator is often used for displaying modals on top of all other content.
  * https://reactnavigation.org/docs/modal
  */
-const Stack = createNativeStackNavigator<RootStackParamList>();
 
-function RootNavigator() {
+const Drawer = createDrawerNavigator<RootStackParamList>();
+
+function RootNavigator(): React.ReactElement {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
-      <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
-      <Stack.Group screenOptions={{ presentation: 'modal' }}>
-        <Stack.Screen name="Modal" component={ModalScreen} />
-      </Stack.Group>
-    </Stack.Navigator>
+    <Drawer.Navigator
+      screenOptions={{
+        headerShown: false,
+        drawerType: 'slide',
+        lazy: false,
+        drawerStyle: {
+          width: Platform.OS === 'web' ? 220 : '60%',
+        },
+      }}
+    >
+      <Drawer.Screen name="Root" component={BottomTabNavigator} />
+      <Drawer.Screen name="Modal" component={NotFoundScreen} />
+    </Drawer.Navigator>
   );
 }
+
+// const Stack = createNativeStackNavigator<RootStackParamList>();
+//
+// function RootNavigator() {
+//   return (
+//     <Stack.Navigator>
+//       <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
+//       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
+//       <Stack.Group screenOptions={{ presentation: 'modal' }}>
+//         <Stack.Screen name="Modal" component={ModalScreen} />
+//       </Stack.Group>
+//     </Stack.Navigator>
+//   );
+// }
 
 /**
  * A bottom tab navigator displays tab buttons on the bottom of the display to switch screens.
